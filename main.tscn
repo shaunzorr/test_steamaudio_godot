@@ -1,0 +1,84 @@
+[gd_scene load_steps=14 format=3 uid="uid://df7pd4pd8amk0"]
+
+[ext_resource type="Texture2D" uid="uid://b0o2tlv18hkh4" path="res://addons/kenney_prototype_textures/dark/texture_08.png" id="1_v74um"]
+[ext_resource type="SteamAudioMaterial" uid="uid://bljhgad6g2vnm" path="res://addons/steamaudio/materials/concrete_material.tres" id="2_yao03"]
+[ext_resource type="Script" path="res://src/Camera3D.gd" id="3_apn8r"]
+[ext_resource type="Texture2D" uid="uid://qjj2lfxhimhp" path="res://addons/kenney_prototype_textures/green/texture_08.png" id="4_n03v7"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_jyxvo"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_8r6ib"]
+sky_material = SubResource("ProceduralSkyMaterial_jyxvo")
+
+[sub_resource type="Environment" id="Environment_a5pte"]
+background_mode = 2
+sky = SubResource("Sky_8r6ib")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f7een"]
+albedo_texture = ExtResource("1_v74um")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ygcx2"]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_ncugq"]
+data = PackedVector3Array(1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, -1, 0, -1, 1, 0, -1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ejltx"]
+albedo_texture = ExtResource("4_n03v7")
+
+[sub_resource type="SphereMesh" id="SphereMesh_c1o6h"]
+
+[sub_resource type="SteamAudioStream" id="SteamAudioStream_dy1q8"]
+
+[node name="Main" type="Node3D"]
+
+[node name="SteamAudioConfig" type="SteamAudioConfig" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_a5pte")
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_f7een")
+mesh = SubResource("PlaneMesh_ygcx2")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Floor"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_ncugq")
+
+[node name="SteamAudioGeometry" type="SteamAudioGeometry" parent="Floor/StaticBody3D/CollisionShape3D"]
+material = ExtResource("2_yao03")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.958854, 0.283898, 0, -0.283898, 0.958854, 0, 2.18515, 4.55661)
+script = ExtResource("3_apn8r")
+
+[node name="SteamAudioListener" type="SteamAudioListener" parent="Camera3D"]
+
+[node name="Speaker" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.45135, 0)
+material_override = SubResource("StandardMaterial3D_ejltx")
+mesh = SubResource("SphereMesh_c1o6h")
+
+[node name="SteamAudioPlayer" type="SteamAudioPlayer" parent="Speaker"]
+stream = SubResource("SteamAudioStream_dy1q8")
+attenuation_model = 3
+panning_strength = 0.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+offset_right = 190.0
+offset_bottom = 66.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+text = "Press up to load and play 2.mp3"
